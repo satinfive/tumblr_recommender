@@ -43,7 +43,7 @@ def extrae_blogs(blog):
 
     return list(set(blogsextraidos)), postsfotos, poststexto
 
-def new_blog(blog):
+def new_blog(blog, princ=False):
 
     infoblog = cliente.blog_info(blog)
 
@@ -52,14 +52,17 @@ def new_blog(blog):
     except KeyError:
       return "next"
 
-    posts = infoblog['blog']['total_posts']
-    desc = infoblog['blog']['description']
-    act = str(to_tiempolocal(infoblog['blog']['updated']))
+    if princ:
+        return "exists"
+    else:
+        posts = infoblog['blog']['total_posts']
+        desc = infoblog['blog']['description']
+        act = str(to_tiempolocal(infoblog['blog']['updated']))
 
-    b = dbp.nodes.create(nombre=blog, url=link, numposts=posts,
-                        bio=desc, actualizado=act)
+        b = dbp.nodes.create(nombre=blog, url=link, numposts=posts,
+                            bio=desc, actualizado=act)
 
-    return b
+        return b
 
 def to_tiempolocal(secondsepoch):
 
@@ -138,7 +141,7 @@ while len(cola_fifo) > 0:
         cola_fifo = cola_fifo[1:]
         continue
 
-    bp = new_blog(blogactual)
+    bp = new_blog(blogactual, princ=True)
 
     if bp == "next":
         print "El blog no existe"
