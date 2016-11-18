@@ -2,7 +2,7 @@ import pytumblr
 from neo4jrestclient.client import GraphDatabase
 from neo4jrestclient import client
 from datetime import datetime
-from time import ctime
+from time import ctime, sleep
 
 db = GraphDatabase("http://localhost:7475", username="neo4j", password="Doraemon2")
 
@@ -14,8 +14,25 @@ cliente = pytumblr.TumblrRestClient(
   '9G2K9tUn4KXP0Y6QsVQJOR9nYaQqOf5gMb2SmdEcWQHEVSfYKF'
 )
 
-following = cliente.following()['blogs']
-cola_fifo = [blog['name'] for blog in following]
+'''tam = cliente.following()['total_blogs']
+
+cola_fifo = []
+
+
+for i in range(0, tam, 10):
+
+    cola_fifo.extend([blog['name'] for blog in cliente.following(offset=i, limit=10)['blogs']])
+
+f = open("ddf_log.txt", 'w')
+f.writelines([blog+"\n" for blog in cola_fifo])
+f.close()'''
+
+'''PARA RECUPERAR'''
+f = open("ddf_log.txt", "r")
+cola_fifotexto = [line for line in f.readlines()]
+cola_fifo = [blog for blog in map(lambda x: x.replace('\n', ''), cola_fifotexto) if blog != '']
+f.close()
+
 
 '''Funciones para la descarga de datos'''
 def extrae_blogs(blog):
@@ -192,6 +209,10 @@ while len(cola_fifo) > 0:
     #Eliminar duplicados del blogsparciales
     cola_fifo.extend(blogsparciales)
     cola_fifo = cola_fifo[1:]
+    f = open("ddf_log.txt", 'w')
+    f.writelines([blog+"\n" for blog in cola_fifo])
+    f.close()
+    sleep(60)
 
 
 #print client.blog_info('quietlim')
